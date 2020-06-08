@@ -138,13 +138,13 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <input type="text" id="txtNoteTitle" class="form-control" runat="server" placeholder="Title" />
+                        <input type="text" id="txtNoteTitle" class="form-control" placeholder="Title" />
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
-                        <textarea class="form-control" runat="server" id="txtNoteContent" aria-multiline="true" style="height: 200px; width: 100%" placeholder="Content"></textarea>
+                        <textarea class="form-control" id="txtNoteContent" aria-multiline="true" style="height: 200px; width: 100%" placeholder="Content"></textarea>
                     </div>
                     <div class="modal-footer">
                         <div class="color-container">
@@ -219,12 +219,15 @@
         }
 
         function addNote() {
-            var category = $('#<%=hfCategoryId.ClientID%>').val();
+            var category = 1; //initialize category id = 1 and check if another category is selected--> (1=Uncategorized)
+            if ($('#<%=hfCategoryId.ClientID%>').val() != "") {
+                category = $('#<%=hfCategoryId.ClientID%>').val();
+            }
             var bgcolor = $.fn.bcPicker.toHex($('.bcPicker-picker').css("background-color"));
             var request = JSON.stringify({
                 catId: category,
-                noteTitle: $('#<%=txtNoteTitle.ClientID%>').val(),
-                noteContent: $('#<%=txtNoteContent.ClientID%>').val(),
+                noteTitle: $('#txtNoteTitle').val(),
+                noteContent: $('#txtNoteContent').val(),
                 noteColor: bgcolor
             });
             $.ajax({

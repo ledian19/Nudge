@@ -84,7 +84,7 @@ namespace Nudge.Utilities {
                                                         , n.user_id
                                               FROM      [NUDGE].[dbo].[Notes] n
                                               WHERE     n.category_id=@catId
-                                              ORDER BY  ";
+                                              ORDER BY  n.creation_date DESC";
 
                         cmd.Parameters.Add(new SqlParameter("@catId", SqlDbType.Int)).Value = cat_id;
 
@@ -113,14 +113,16 @@ namespace Nudge.Utilities {
                 using (var con = new SqlConnection(getConString())) {
                     con.Open();
                     using (var cmd = con.CreateCommand()) {
-                        cmd.CommandText = @"INSERT INTO     Notes (user_id, category_id, note_title, note_content, note_highlight)
-                                            VALUES          (@userid, @catId, @noteTitle, @noteContent, @noteHighlight);";
+                        cmd.CommandText = @"INSERT INTO     Notes (user_id, category_id, note_title, note_content, note_highlight, creation_date, last_updated_on)
+                                            VALUES          (@userid, @catId, @noteTitle, @noteContent, @noteHighlight, @creationDate, @lastUpdatedOn);";
 
                         cmd.Parameters.Add(new SqlParameter("@userid", SqlDbType.Int)).Value = userId;
                         cmd.Parameters.Add(new SqlParameter("@catId", SqlDbType.Int)).Value = catId;
                         cmd.Parameters.Add(new SqlParameter("@noteTitle", SqlDbType.VarChar, 250)).Value = noteTitle;
                         cmd.Parameters.Add(new SqlParameter("@noteContent", SqlDbType.VarChar, 500)).Value = noteContent;
                         cmd.Parameters.Add(new SqlParameter("@noteHighlight", SqlDbType.VarChar, 50)).Value = noteColor;
+                        cmd.Parameters.Add(new SqlParameter("@creationDate", SqlDbType.DateTime)).Value = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
+                        cmd.Parameters.Add(new SqlParameter("@lastUpdatedOn", SqlDbType.DateTime)).Value = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
 
                         cmd.ExecuteNonQuery();
                     }
