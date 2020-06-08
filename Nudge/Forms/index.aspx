@@ -21,7 +21,7 @@
         <div class="wrapper">
             <!-- Navbar -->
             <nav class="main-header navbar navbar-expand navbar-white navbar-light">
-                
+
                 <asp:HiddenField runat="server" ID="hfStringCategories" />
                 <asp:HiddenField runat="server" ID="hfCategoryId" />
 
@@ -73,7 +73,6 @@
                     <nav class="mt-2">
                         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                             <div runat="server" id="divInsertHtml">
-
                             </div>
                             <li class="nav-header">LABELS</li>
                             <li class="nav-item">
@@ -105,9 +104,10 @@
                     <div class="container-fluid">
                         <div class="row mb-2">
                             <div class="col-sm-6">
-                                <h1 id="categoryTitle">
-                                    
-                                </h1>
+                                <h1 id="categoryTitle"></h1>
+                            </div>
+                            <div class="col-sm-6" style="">
+                                <input type="image" src="../Add-ons/images/add.png" style="width: 50px; height: 50px; float: right; margin-right: 50px;" onclick="addNote()" />
                             </div>
                         </div>
                     </div>
@@ -117,7 +117,6 @@
                 <section class="content">
                     <div class="container-fluid">
                         <div class="row" id="divNotes" style="display: none" runat="server">
-
                         </div>
                     </div>
                 </section>
@@ -132,6 +131,27 @@
 
 
         </div>
+
+        <div class="modal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Modal title</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Modal body text goes here.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary">Save changes</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </form>
 
 
@@ -144,7 +164,26 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
 
     <script>
+        
+        $(".nav-link.active").click(function () {
+            var catid = $(this).attr("id");
+            getNotesByCatId(catid);
+        });
 
+        function getNotesByCatId(catId) {
+            bindNodes(catId, function (errorMsg, notesStringResponse, categoryName, hfCategoryId) {
+                if (errorMsg != 'SUCCESS') {
+                    showMessage(errorMsg);
+                    return;
+                }
+                $("#<%=divNotes.ClientID%>").hide();
+                $("#<%=divNotes.ClientID%>").html("");
+                $("#<%=divNotes.ClientID%>").delay(300).slideDown();
+                document.getElementById('<%=divNotes.ClientID%>').insertAdjacentHTML('beforeend', notesStringResponse);
+                $('#categoryTitle').html(categoryName);
+                $('#<%=hfCategoryId.ClientID%>').val(hfCategoryId);
+            });
+        }
         function bindNodes(catid, callback) {
             var request = JSON.stringify({
                 stringCatId: catid,
@@ -165,32 +204,23 @@
             });
         }
 
-        $(".nav-link.active").click(function () {
-            var catid = $(this).attr("id");
-            bindNodes(catid, function (errorMsg, notesStringResponse, categoryName, hfCategoryId) {
-                if (errorMsg != 'SUCCESS') {
-                    showMessage(errorMsg);
-                    return;
-                }
-                $("#<%=divNotes.ClientID%>").hide();
-                $("#<%=divNotes.ClientID%>").html("");
-                $("#<%=divNotes.ClientID%>").delay(300).slideDown();
-                document.getElementById('<%=divNotes.ClientID%>').insertAdjacentHTML('beforeend', notesStringResponse);
-                $('#categoryTitle').html(categoryName);
-                $('#<%=hfCategoryId.ClientID%>').val(hfCategoryId);
-            });
-        });
-
         function addNote() {
+            var category = $('#<%=hfCategoryId.ClientID%>').val();
+            var request = JSON.stringify({
+                catId: category,
+                noteTitle: 'Title',
+                noteContent: 'Content',
+                noteColor: 'Red'
+            });
             $.ajax({
                 type: "POST",
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
-                url: "index.aspx/DisplayNotes",
+                url: "index.aspx/AddNote",
                 data: request,
                 success: function (res) {
-                    var data = JSON.parse(res.d);
-                    callback(data.errorMsg, data.notesStringResponse, data.categoryName, data.categoryId);
+                    showMessage(res.d);
+                    getNotesByCatId(category);
                 },
                 error: function (jqXHR, status, errorThrown) {
                     showMessage("An error occured. Sorry!");

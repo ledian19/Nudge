@@ -115,13 +115,18 @@ namespace Nudge.Forms {
             }
         }
 
-        public static string addNote(int catId, string noteTitle, string noteContent, string noteColor) {
+        [WebMethod]
+        public static string AddNote(int catId, string noteTitle, string noteContent, string noteColor) {
             var res = AppUtils.addNote(userId: 1,
                                      catId: catId,
                                      noteTitle: noteTitle,
                                      noteContent: noteContent,
                                      noteColor: noteColor);
-
+            if (res == false) {
+                return "An error occured.";
+            } else {
+                return "Successfully added note";
+            }
         }
         #endregion
 

@@ -13,6 +13,8 @@ namespace Nudge.Utilities {
             return ConfigurationManager.ConnectionStrings["NudgeConnectionString"].ConnectionString;
         }
 
+        #region Categories
+
         public static List<category> getCategories(int user_id) {
             var myCategories = new List<category>();
             try {
@@ -51,6 +53,20 @@ namespace Nudge.Utilities {
                 return myCategories;
             }
         }
+
+        public static List<category> getChildren(category node, List<category> myCategories) {
+            var children = new List<category>();
+            foreach (var cat in myCategories) {
+                if (cat.parentId == node.categoryId) {
+                    children.Add(cat);
+                }
+            }
+            return children;
+        }
+
+        #endregion
+
+        #region Notes
 
         public static List<note> getNotesByCategory(int cat_id) {
             var myNotes = new List<note>();
@@ -91,6 +107,34 @@ namespace Nudge.Utilities {
             }
         }
 
+        public static bool addNote(int userId, int catId, string noteTitle, string noteContent, string noteColor) {
+            try {
+                using (var con = new SqlConnection(getConString())) {
+                    con.Open();
+                    using (var cmd = con.CreateCommand()) {
+                        cmd.CommandText = @"INSERT INTO     Notes (user_id, category_id, note_title, note_content, note_highlight)
+                                            VALUES          (@userid, @catId, @noteTitle, @noteContent, @noteHighlight);";
+
+                        cmd.Parameters.Add(new SqlParameter("@userid", SqlDbType.Int)).Value = userId;
+                        cmd.Parameters.Add(new SqlParameter("@catId", SqlDbType.Int)).Value = catId;
+                        cmd.Parameters.Add(new SqlParameter("@noteTitle", SqlDbType.VarChar, 250)).Value = noteTitle;
+                        cmd.Parameters.Add(new SqlParameter("@noteContent", SqlDbType.VarChar, 500)).Value = noteContent;
+                        cmd.Parameters.Add(new SqlParameter("@noteHighlight", SqlDbType.VarChar, 50)).Value = noteColor;
+
+                        cmd.ExecuteNonQuery();
+                    }
+                    con.Close();
+                }
+                return true;
+            } catch (Exception ex) {
+                return false;
+            }
+        }
+
+        #endregion
+
+        #region Tags
+
         public static List<tag> getTagsByNoteId(int noteId) {
             var myNotes = new List<tag>();
             int a = -1;
@@ -123,39 +167,10 @@ namespace Nudge.Utilities {
             }
         }
 
-        public static List<category> getChildren(category node, List<category> myCategories) {
-            var children = new List<category>();
-            foreach (var cat in myCategories) {
-                if (cat.parentId == node.categoryId) {
-                    children.Add(cat);
-                }
-            }
-            return children;
-        }
+        #endregion
 
-        public static bool addNote(int userId, int catId, string noteTitle, string noteContent, string noteColor) {
-            try {
-                using (var con = new SqlConnection(getConString())) {
-                    con.Open();
-                    using (var cmd = con.CreateCommand()) {
-                        cmd.CommandText = @"INSERT INTO     Notes (user_id, category_id, note_title, note_content, note_highlight)
-                                            VALUES          (@userid, @catId, @noteTitle, @noteContent, @noteHighlight);";
+        #region Class Declaration
 
-                        cmd.Parameters.Add(new SqlParameter("@userid", SqlDbType.Int)).Value = userId;
-                        cmd.Parameters.Add(new SqlParameter("@catId", SqlDbType.Int)).Value = catId;
-                        cmd.Parameters.Add(new SqlParameter("@noteTitle", SqlDbType.VarChar, 250)).Value = noteTitle;
-                        cmd.Parameters.Add(new SqlParameter("@noteContent", SqlDbType.VarChar, 500)).Value = noteContent;
-                        cmd.Parameters.Add(new SqlParameter("@noteHighlight", SqlDbType.VarChar, 50)).Value = noteColor;
-
-                        cmd.ExecuteNonQuery();
-                    }
-                    con.Close();
-                }
-                return true;
-            } catch(Exception ex) {
-                return false;
-            }
-        }
         public class category {
             public int categoryId { get; set; }
             public string categoryName { get; set; }
@@ -175,6 +190,8 @@ namespace Nudge.Utilities {
             public int tagId { get; set; }
             public string  tagName { get; set; }
         }
-        
+
+        #endregion
+
     }
 }
