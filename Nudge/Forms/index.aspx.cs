@@ -116,9 +116,10 @@ namespace Nudge.Forms {
         }
 
         [WebMethod]
-        public static string AddNote(int catId, string noteTitle, string noteContent, string noteColor) {
+        public static string AddNote(string catId, string noteTitle, string noteContent, string noteColor) {
+            int intCategory = Convert.ToInt32(catId);
             var res = AppUtils.addNote(userId: 1,
-                                     catId: catId,
+                                     catId: intCategory,
                                      noteTitle: noteTitle,
                                      noteContent: noteContent,
                                      noteColor: noteColor);

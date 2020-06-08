@@ -94,9 +94,9 @@
     <Compile Include="Utilities\AppUtils.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Add-ons\CSS\" />
-    <Folder Include="Add-ons\images\" />
-    <Folder Include="Add-ons\JS\" />
+    <Folder Include="src\CSS\" />
+    <Folder Include="src\images\" />
+    <Folder Include="src\JS\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

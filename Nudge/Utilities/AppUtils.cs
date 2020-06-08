@@ -83,7 +83,8 @@ namespace Nudge.Utilities {
                                                         , n.note_highlight
                                                         , n.user_id
                                               FROM      [NUDGE].[dbo].[Notes] n
-                                              WHERE     n.category_id=@catId";
+                                              WHERE     n.category_id=@catId
+                                              ORDER BY  ";
 
                         cmd.Parameters.Add(new SqlParameter("@catId", SqlDbType.Int)).Value = cat_id;
 
