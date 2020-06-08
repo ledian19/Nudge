@@ -133,6 +133,29 @@ namespace Nudge.Utilities {
             return children;
         }
 
+        public static bool addNote(int userId, int catId, string noteTitle, string noteContent, string noteColor) {
+            try {
+                using (var con = new SqlConnection(getConString())) {
+                    con.Open();
+                    using (var cmd = con.CreateCommand()) {
+                        cmd.CommandText = @"INSERT INTO     Notes (user_id, category_id, note_title, note_content, note_highlight)
+                                            VALUES          (@userid, @catId, @noteTitle, @noteContent, @noteHighlight);";
+
+                        cmd.Parameters.Add(new SqlParameter("@userid", SqlDbType.Int)).Value = userId;
+                        cmd.Parameters.Add(new SqlParameter("@catId", SqlDbType.Int)).Value = catId;
+                        cmd.Parameters.Add(new SqlParameter("@noteTitle", SqlDbType.VarChar, 250)).Value = noteTitle;
+                        cmd.Parameters.Add(new SqlParameter("@noteContent", SqlDbType.VarChar, 500)).Value = noteContent;
+                        cmd.Parameters.Add(new SqlParameter("@noteHighlight", SqlDbType.VarChar, 50)).Value = noteColor;
+
+                        cmd.ExecuteNonQuery();
+                    }
+                    con.Close();
+                }
+                return true;
+            } catch(Exception ex) {
+                return false;
+            }
+        }
         public class category {
             public int categoryId { get; set; }
             public string categoryName { get; set; }

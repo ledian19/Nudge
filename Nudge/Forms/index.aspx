@@ -21,6 +21,11 @@
         <div class="wrapper">
             <!-- Navbar -->
             <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+                
+                <asp:HiddenField runat="server" ID="hfStringCategories" />
+                <asp:HiddenField runat="server" ID="hfCategoryId" />
+
+
 
                 <!-- Left navbar links -->
                 <ul class="navbar-nav">
@@ -40,7 +45,6 @@
                                 </button>
                             </div>
                         </div>
-                        <asp:HiddenField runat="server" ID="count" />
                     </div>
                 </ul>
             </nav>
@@ -101,7 +105,9 @@
                     <div class="container-fluid">
                         <div class="row mb-2">
                             <div class="col-sm-6">
-                                <h1>Category Here</h1>
+                                <h1 id="categoryTitle">
+                                    
+                                </h1>
                             </div>
                         </div>
                     </div>
@@ -139,26 +145,58 @@
 
     <script>
 
-        $(".nav-link.active").click(function () {
-            var catid = $(this).attr("id");
-
+        function bindNodes(catid, callback) {
+            var request = JSON.stringify({
+                stringCatId: catid,
+            });
             $.ajax({
                 type: "POST",
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
-                url: "index.aspx/displayNotes",
-                data: '{catId: ' + catid +'  }',
+                url: "index.aspx/DisplayNotes",
+                data: request,
                 success: function (res) {
-                    $("#<%=divNotes.ClientID%>").hide();
-                    $("#<%=divNotes.ClientID%>").html("");
-                    $("#<%=divNotes.ClientID%>").delay(300).slideDown();
-                    document.getElementById('<%=divNotes.ClientID%>').insertAdjacentHTML('beforeend', res.d);
+                    var data = JSON.parse(res.d);
+                    callback(data.errorMsg, data.notesStringResponse, data.categoryName, data.categoryId);
                 },
                 error: function (jqXHR, status, errorThrown) {
-                    showMessage("An error occured.");
+                    showMessage("An error occured. Sorry!");
                 }
             });
+        }
+
+        $(".nav-link.active").click(function () {
+            var catid = $(this).attr("id");
+            bindNodes(catid, function (errorMsg, notesStringResponse, categoryName, hfCategoryId) {
+                if (errorMsg != 'SUCCESS') {
+                    showMessage(errorMsg);
+                    return;
+                }
+                $("#<%=divNotes.ClientID%>").hide();
+                $("#<%=divNotes.ClientID%>").html("");
+                $("#<%=divNotes.ClientID%>").delay(300).slideDown();
+                document.getElementById('<%=divNotes.ClientID%>').insertAdjacentHTML('beforeend', notesStringResponse);
+                $('#categoryTitle').html(categoryName);
+                $('#<%=hfCategoryId.ClientID%>').val(hfCategoryId);
+            });
         });
+
+        function addNote() {
+            $.ajax({
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                url: "index.aspx/DisplayNotes",
+                data: request,
+                success: function (res) {
+                    var data = JSON.parse(res.d);
+                    callback(data.errorMsg, data.notesStringResponse, data.categoryName, data.categoryId);
+                },
+                error: function (jqXHR, status, errorThrown) {
+                    showMessage("An error occured. Sorry!");
+                }
+            });
+        }
 
         function showMessage(msg) {
             alert(msg);

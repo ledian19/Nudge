@@ -13,13 +13,22 @@ namespace Nudge.Forms {
     public partial class index {
         
         /// <summary>
-        /// count control.
+        /// hfStringCategories control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.HiddenField count;
+        protected global::System.Web.UI.WebControls.HiddenField hfStringCategories;
+        
+        /// <summary>
+        /// hfCategoryId control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hfCategoryId;
         
         /// <summary>
         /// divInsertHtml control.
