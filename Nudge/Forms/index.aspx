@@ -26,8 +26,6 @@
                 <asp:HiddenField runat="server" ID="hfStringCategories" />
                 <asp:HiddenField runat="server" ID="hfCategoryId" />
 
-
-
                 <!-- Left navbar links -->
                 <ul class="navbar-nav">
                     <li class="nav-item">
@@ -117,19 +115,12 @@
                 <!-- Main content -->
                 <section class="content">
                     <div class="container-fluid">
-                        <div class="row" id="divNotes" style="display: none" runat="server">
+                        <div class="row" id="divNotes" runat="server">
+
                         </div>
                     </div>
                 </section>
             </div>
-
-            <footer class="main-footer">
-                <div class="float-right d-none d-sm-block">
-                    <b>Version</b> 1.0
-                </div>
-                <strong>Copyright &copy; 2020 <a href="http://nudge.al">Nudge.al</a>.</strong> All rights reserved.
-            </footer>
-
 
         </div>
 
@@ -168,15 +159,16 @@
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
     <script type="text/javascript" src="../src/JS/bcPicker.js"></script>
-    <script>
 
+    <script>
         //prevent image button from submiting (default behaviour)
         $('#btnAdd').click(function (event) {
             event.preventDefault();
         });
         $('#bcPicker1').bcPicker({
+            defaultColor: "FFFFFF",
             colors: [
-                '35373B', '585218', '3A2353', '2E4F1D', '164642', '522625'
+                'F08077', 'E5E7EA', 'E2C29E', 'C4EEF7', '9DFFE8', 'C5FF85', 'FFF26A'
             ]
         });
 
@@ -184,6 +176,7 @@
             var catid = $(this).attr("id");
             getNotesByCatId(catid);
         });
+
         function getNotesByCatId(catId) {
             bindNodes(catId, function (errorMsg, notesStringResponse, categoryName, hfCategoryId) {
                 if (errorMsg != 'SUCCESS') {
@@ -217,9 +210,8 @@
                 }
             });
         }
-
         function addNote() {
-            var category = 1; //initialize category id = 1 and check if another category is selected--> (1=Uncategorized)
+            var category = 1; //initialize category id = 1 and check if another category is selected --> (1=Uncategorized)
             if ($('#<%=hfCategoryId.ClientID%>').val() != "") {
                 category = $('#<%=hfCategoryId.ClientID%>').val();
             }

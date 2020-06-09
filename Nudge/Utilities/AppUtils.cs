@@ -96,6 +96,7 @@ namespace Nudge.Utilities {
                                 currentNote.userId = Convert.ToInt32(dr["user_id"]);
                                 currentNote.noteContent = dr["note_content"] as string;
                                 currentNote.noteTitle = dr["note_title"] as string;
+                                currentNote.noteHighlight = dr["note_highlight"] as string;
                                 myNotes.Add(currentNote);
                             }
                         }
@@ -186,6 +187,7 @@ namespace Nudge.Utilities {
             public string noteContent { get; set; }
             public int categoryId { get; set; }
             public string noteTitle { get; set; }
+            public string noteHighlight { get; set; }
             public int userId { get; set; }
         }
 

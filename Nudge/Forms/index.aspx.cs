@@ -75,27 +75,41 @@ namespace Nudge.Forms {
                 foreach (var note in notesByCat) {
                     var noteTags = AppUtils.getTagsByNoteId(note.noteId);
                     printedNotes +=
-                    "<div class='col-lg-4 col-sm-12 col-md-6 col-xs-12'>" +
-                        "<div class='card'>" +
-                            "<div class='card-header'>" +
-                                "<h3 class='card-title'>" + note.noteTitle + "</h3>" +
-                                  "<div class=''card-tools'>" +
-                                      "<button type='button' class='btn btn-tool' data-card-widget='collapse' data-toggle='tooltip' title = 'Collapse' > " +
-                                        "<i class='fas fa-minus'>" + "</i>" +
-                                    "</button>" +
-                                    "<button type='button' class='btn btn-tool' data-card-widget='remove' data-toggle='tooltip' title = 'Remove' > " +
-                                        "<i class='fas fa-times'>" + "</i>" +
-                                    "</button>" +
-                                "</div>" +
-                            "</div>" +
-                            "<div class='card-body'>" +
-                                note.noteContent +
-                            "</div>" +
-                            "<div class='card-footer'>";
+                            "<div class='col-lg-4 col-sm-12 col-md-6 col-xs-12'>" +
+                                "<div id='" + note.noteId + "' class='card' style='background-color: " + note.noteHighlight + ";'>" +
+                                    "<div class='card-header' style='background-color: " + note.noteHighlight + "; border: none'>" +
+                                        "<h3 class='card-title text-bold'>" + note.noteTitle + "</h3>" +
+                                        "<div class=''card-tools'>" +
+                                            "<button type='button' class='btn btn-tool' data-card-widget='collapse' data-toggle='tooltip' title = 'Collapse' style='float:right'> " +
+                                                "<i class='fas fa-minus'>" + "</i>" +
+                                            "</button>" +
+                                        "</div>" +
+                                    "</div>" +
+                                    "<div class='card-body'>" +
+                                        "<p>" +
+                                        note.noteContent +
+                                        "</p>";
                     foreach (var tag in noteTags) {
-                        printedNotes += "<a href='#'>" + "<span class='border border-secondary rounded p-1'>#" + tag.tagName + "</span></a>";
+                        printedNotes += "<a href='#'>" + "<span class='border border-secondary rounded p-1'>" + tag.tagName + "</span></a>";
                     }
-                    printedNotes += "</div></div></div>";
+                    printedNotes +=
+                                    "</div>" +
+                                    "<div class='card-footer' style='border: none; background-color: " + note.noteHighlight + ";'>" +
+                                        "<button type='button' class='btn btn-tool p-1' style='float: right'>"+
+                                        "    <i class='fas fa-ellipsis-v'></i>"+
+                                        "</button>"+
+                                        "<button type='button' class='btn btn-tool p-1' style='float: right'>"+
+                                        "    <i class='fas fa-edit'></i>"+
+                                        "</button>"+
+                                        "<button type='button' class='btn btn-tool p-1' style='float: right'>"+
+                                        "    <i class='fas fa-trash-alt'></i>"+
+                                        "</button>"+
+                                        "<button type='button' class='btn btn-tool p-1' style='float: right'>"+
+                                        "    <i class='fas fa-bookmark'></i>"+
+                                        "</button>"+
+                                    "</div>"+
+                                "</div>"+
+                            "</div>";
                 }
             }
             return JsonConvert.SerializeObject(new {
