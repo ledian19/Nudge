@@ -28,12 +28,13 @@ namespace Nudge.Forms {
                 }
                 divInsertHtml.InnerHtml = hfStringCategories.Value;
                 hfStringCategories.Value = "";
+                DisplayNotes("1");
             }
         }
 
         #endregion
 
-        #region Helper Methods
+        #region Category management methods
 
         public void RecursiveNodeCall(AppUtils.category node, List<AppUtils.category> myCategories) {
             var children = AppUtils.getChildren(node, myCategories);
@@ -59,6 +60,10 @@ namespace Nudge.Forms {
                                "<ul class='nav nav-treeview'>";
         }
 
+        #endregion
+
+        #region Note management WebMethods
+
         [WebMethod(EnableSession = true)]
         public static string DisplayNotes(string stringCatId) {
             var myCategories = AppUtils.getCategories(1);
@@ -71,12 +76,12 @@ namespace Nudge.Forms {
 
             string printedNotes = "";
             foreach (var child in childrenList) {
-                var notesByCat = AppUtils.getNotesByCategory(Convert.ToInt32(child));
+                var notesByCat = AppUtils.getNotesByCategory(Convert.ToInt32(child), 1);
                 foreach (var note in notesByCat) {
                     var noteTags = AppUtils.getTagsByNoteId(note.noteId);
                     printedNotes +=
                             "<div class='col-lg-4 col-sm-12 col-md-6 col-xs-12'>" +
-                                "<div id='" + note.noteId + "' class='card' style='background-color: " + note.noteHighlight + ";'>" +
+                                "<div class='card' style='background-color: " + note.noteHighlight + ";'>" +
                                     "<div class='card-header' style='background-color: " + note.noteHighlight + "; border: none'>" +
                                         "<h3 class='card-title text-bold'>" + note.noteTitle + "</h3>" +
                                         "<div class=''card-tools'>" +
@@ -100,10 +105,10 @@ namespace Nudge.Forms {
                                         "</button>"+
                                         "<button type='button' class='btn btn-tool p-1' style='float: right'>"+
                                         "    <i class='fas fa-edit'></i>"+
-                                        "</button>"+
-                                        "<button type='button' class='btn btn-tool p-1' style='float: right'>"+
-                                        "    <i class='fas fa-trash-alt'></i>"+
-                                        "</button>"+
+                                        "</button>" +
+                                        "<button type='button' onclick='deleteNote(" + note.noteId + ")' class='btn btn-tool p-1' style='float: right'>" +
+                                        "    <i class='fas fa-trash-alt'></i>" +
+                                        "</button>" +
                                         "<button type='button' class='btn btn-tool p-1' style='float: right'>"+
                                         "    <i class='fas fa-bookmark'></i>"+
                                         "</button>"+
@@ -143,10 +148,18 @@ namespace Nudge.Forms {
                 return "Successfully added note";
             }
         }
-        #endregion
 
-        #region Class Declaration
+        [WebMethod]
+        public static string DeleteNote(int noteId) {
+            var res = AppUtils.deleteNote(noteId);
+            if (res == false) {
+                return "An error occured.";
+            } else {
+                return "Successfully deleted note";
+            }
+        }
 
         #endregion
+        
     }
 }

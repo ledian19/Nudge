@@ -68,14 +68,29 @@ namespace Nudge.Utilities {
 
         #region Notes
 
-        public static List<note> getNotesByCategory(int cat_id) {
+        public static List<note> getNotesByCategory(int cat_id, int userId) {
             var myNotes = new List<note>();
             int a = -1;
             try {
                 using (var con = new SqlConnection(getConString())) {
                     con.Open();
                     using (var cmd = con.CreateCommand()) {
-                        cmd.CommandText = @"SELECT      
+
+                        //cat_id = 1 --> retrieve all Notes (no category selected) 
+                        if (cat_id == 1) {
+                            cmd.CommandText = @"SELECT      
+	                                                      n.note_id
+                                                        , n.note_content
+                                                        , n.category_id
+                                                        , n.note_title
+                                                        , n.note_highlight
+                                                        , n.user_id
+                                              FROM      [NUDGE].[dbo].[Notes] n
+                                              WHERE     n.user_id=@userId
+                                              ORDER BY  n.creation_date DESC";
+                            cmd.Parameters.Add(new SqlParameter("@userId", SqlDbType.Int)).Value = userId;
+                        } else {
+                            cmd.CommandText = @"SELECT      
 	                                                      n.note_id
                                                         , n.note_content
                                                         , n.category_id
@@ -84,9 +99,11 @@ namespace Nudge.Utilities {
                                                         , n.user_id
                                               FROM      [NUDGE].[dbo].[Notes] n
                                               WHERE     n.category_id=@catId
+                                              AND       n.user_id=@userId
                                               ORDER BY  n.creation_date DESC";
-
-                        cmd.Parameters.Add(new SqlParameter("@catId", SqlDbType.Int)).Value = cat_id;
+                            cmd.Parameters.Add(new SqlParameter("@catId", SqlDbType.Int)).Value = cat_id;
+                            cmd.Parameters.Add(new SqlParameter("@userId", SqlDbType.Int)).Value = userId;
+                        }
 
                         using (var dr = cmd.ExecuteReader()) {
                             while (dr.Read()) {
@@ -135,6 +152,24 @@ namespace Nudge.Utilities {
             }
         }
 
+        public static bool deleteNote(int noteId) {
+            try {
+                using (var con = new SqlConnection(getConString())) {
+                    con.Open();
+                    using (var cmd = con.CreateCommand()) {
+                        cmd.CommandText = @"DELETE FROM notes WHERE note_id=@noteId";
+
+                        cmd.Parameters.Add(new SqlParameter("@noteId", SqlDbType.Int)).Value = noteId;
+
+                        cmd.ExecuteNonQuery();
+                    }
+                    con.Close();
+                }
+                return true;
+            } catch (Exception ex) {
+                return false;
+            }
+        }
         #endregion
 
         #region Tags

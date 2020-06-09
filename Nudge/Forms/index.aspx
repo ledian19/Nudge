@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
 </head>
 
-<body class="hold-transition sidebar-mini sidebar-collapse">
+<body onload="initializeNotes()" class="hold-transition sidebar-mini sidebar-collapse">
     <form runat="server">
         <div class="wrapper">
             <!-- Navbar -->
@@ -159,6 +159,8 @@
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
     <script type="text/javascript" src="../src/JS/bcPicker.js"></script>
+    <script type="text/javascript" src="../src/JS/Notify/notify.min.js"></script>
+    <script type="text/javascript" src="../src/JS/Notify/notify.js"></script>
 
     <script>
         //prevent image button from submiting (default behaviour)
@@ -168,9 +170,13 @@
         $('#bcPicker1').bcPicker({
             defaultColor: "FFFFFF",
             colors: [
-                'F08077', 'E5E7EA', 'E2C29E', 'C4EEF7', '9DFFE8', 'C5FF85', 'FFF26A'
+                'F08077', 'FFFFFF', 'E5E7EA', 'E2C29E', 'C4EEF7', '9DFFE8', 'C5FF85', 'FFF26A'
             ]
         });
+
+        function initializeNotes() {
+            getNotesByCatId(1);
+        }
 
         $(".nav-link.active").click(function () {
             var catid = $(this).attr("id");
@@ -180,7 +186,7 @@
         function getNotesByCatId(catId) {
             bindNodes(catId, function (errorMsg, notesStringResponse, categoryName, hfCategoryId) {
                 if (errorMsg != 'SUCCESS') {
-                    showMessage(errorMsg);
+                    showMessage(errorMsg, 'error');
                     return;
                 }
                 $("#<%=divNotes.ClientID%>").hide();
@@ -206,7 +212,7 @@
                     callback(data.errorMsg, data.notesStringResponse, data.categoryName, data.categoryId);
                 },
                 error: function (jqXHR, status, errorThrown) {
-                    showMessage("An error occured. Sorry!");
+                    showMessage("An error occured. Sorry!", 'error');
                 }
             });
         }
@@ -229,17 +235,45 @@
                 url: "index.aspx/AddNote",
                 data: request,
                 success: function (res) {
-                    showMessage(res.d);
+                    showMessage(res.d, 'success');
+                    $('#txtNoteTitle').val("");
+                    $('#txtNoteContent').val("");
+                    $('#modalNote').modal('hide');
                     getNotesByCatId(category);
                 },
                 error: function (jqXHR, status, errorThrown) {
-                    showMessage("An error occured. Sorry!");
+                    showMessage("An error occured. Sorry!", 'error');
                 }
             });
         }
+        
+        function deleteNote(id) {
+            var category = 1; //initialize category id = 1 and check if another category is selected --> (1=Uncategorized)
+            if ($('#<%=hfCategoryId.ClientID%>').val() != "") {
+                category = $('#<%=hfCategoryId.ClientID%>').val();
+            }
 
-        function showMessage(msg) {
-            alert(msg);
+            var request = JSON.stringify({
+                noteId: id,
+            });
+            $.ajax({
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                url: "index.aspx/DeleteNote",
+                data: request,
+                success: function (res) {
+                    showMessage(res.d, 'success');
+                    getNotesByCatId(category);
+                },
+                error: function (jqXHR, status, errorThrown) {
+                    showMessage("An error occured. Sorry!", 'error');
+                }
+            });
+        };
+
+        function showMessage(msg, type) {
+            $.notify(msg, type);
         }
 
     </script>
