@@ -78,7 +78,7 @@ namespace Nudge.Forms {
                             "<div class='col-lg-4 col-sm-12 col-md-6 col-xs-12'>" +
                                 "<div id='" + note.noteId + "' class='card' style='background-color: " + note.noteHighlight + ";'>" +
                                     "<div class='card-header' style='background-color: " + note.noteHighlight + "; border: none'>" +
-                                        "<h3 class='card-title text-bold'>" + note.noteTitle + "</h3>" +
+                                        "<h3 class='card-title'>" + note.noteTitle + "</h3>" +
                                         "<div class=''card-tools'>" +
                                             "<button type='button' class='btn btn-tool' data-card-widget='collapse' data-toggle='tooltip' title = 'Collapse' style='float:right'> " +
                                                 "<i class='fas fa-minus'>" + "</i>" +
