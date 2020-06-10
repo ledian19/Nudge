@@ -15,13 +15,22 @@
     <link rel="stylesheet" href="../src/CSS/adminlte.min.css">
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <style>
+        
+        .nav-link:hover{
+            background-color: rgba(0,0,0,.1);
+        }
+        .nav-icon.fas.fa-copy{
+            color: black;
+        }
+    </style>
 </head>
 
 <body onload="initializeNotes()" class="hold-transition sidebar-mini sidebar-collapse">
     <form runat="server">
         <div class="wrapper">
             <!-- Navbar -->
-            <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+            <nav style="border: none" class="main-header navbar navbar-expand navbar-white navbar-light">
 
                 <asp:HiddenField runat="server" ID="hfStringCategories" />
                 <asp:HiddenField runat="server" ID="hfCategoryId" />
@@ -50,7 +59,7 @@
             </nav>
 
             <!-- Main Sidebar Container -->
-            <aside class="main-sidebar sidebar-dark-primary elevation-4">
+            <aside class="main-sidebar sidebar-light-primary elevation-4">
                 <!-- Brand Logo -->
                 <a href="#" class="brand-link">
                     <img src="../src/images/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
@@ -99,7 +108,7 @@
             </aside>
 
             <!-- Content Wrapper. Contains page content -->
-            <div class="content-wrapper">
+            <div class="content-wrapper" style="background: #ffffff">
                 <section class="content-header">
                     <div class="container-fluid">
                         <div class="row mb-2">
@@ -192,13 +201,13 @@
             event.preventDefault();
         });
         $('#bcPicker1').bcPicker({
-            defaultColor: "FFFFFF",
+            defaultColor: "F08077",
             colors: [
                 'F08077', 'FFFFFF', 'E5E7EA', 'E2C29E', 'C4EEF7', '9DFFE8', 'C5FF85', 'FFF26A'
             ]
         });
         $('#bcPicker2').bcPicker({
-            defaultColor: "FFFFFF",
+            defaultColor: "F08077",
             colors: [
                 'F08077', 'FFFFFF', 'E5E7EA', 'E2C29E', 'C4EEF7', '9DFFE8', 'C5FF85', 'FFF26A'
             ]
@@ -255,7 +264,7 @@
             var request = JSON.stringify({
                 catId: category,
                 noteTitle: $('#txtNoteTitle').val(),
-                noteContent: $('#txtNoteContent').val(),
+                noteContent: someText = $('#txtNoteContent').val().replace(/(\r\n|\n|\r)/gm,"<br/>"),
                 noteColor: bgcolor
             });
             $.ajax({
@@ -303,9 +312,10 @@
         };
 
         function initializeEditModal(id, title, content, highlight, category) {
+            var regex = /<br\s*[\/]?>/gi;
             $('#<%=hfNoteId.ClientID%>').val(id);
             $('#txtEditNoteTitle').val(title);
-            $('#txtEditNoteContent').val(content);
+            $('#txtEditNoteContent').val(content.replace(regex, "\n"));
             $('#bcPicker2')[0].children[0].style.backgroundColor = highlight;
             $('#modalEditNote').modal('show');
         }
@@ -349,4 +359,3 @@
 </body>
 
 </html>
-k

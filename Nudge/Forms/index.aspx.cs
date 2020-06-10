@@ -48,7 +48,7 @@ namespace Nudge.Forms {
         
         public void PrintCategory(AppUtils.category node, bool chevron) {
             hfStringCategories.Value += "<li class='nav-item has-treeview'>" +
-                                "<a id=\"" + node.categoryId + "\" href='#' class='nav-link active'> " +
+                                "<a id=\"" + node.categoryId + "\" href='#' class='nav-link'> " +
                                     "<i class='nav-icon fas fa-copy'></i>" +
                                     "<p style='color: black; padding-left: 10px'>" +
                                         node.categoryName +
