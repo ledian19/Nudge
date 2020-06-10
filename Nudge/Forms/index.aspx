@@ -25,7 +25,8 @@
 
                 <asp:HiddenField runat="server" ID="hfStringCategories" />
                 <asp:HiddenField runat="server" ID="hfCategoryId" />
-
+                <asp:HiddenField runat="server" ID="hfNoteId" />
+                
                 <!-- Left navbar links -->
                 <ul class="navbar-nav">
                     <li class="nav-item">
@@ -147,6 +148,29 @@
                 </div>
             </div>
         </div>
+        <!-- Edit Modal -->
+        <div class="modal fade" id="modalEditNote" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <input type="text" id="txtEditNoteTitle" class="form-control" placeholder="Title" />
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <textarea class="form-control" id="txtEditNoteContent" aria-multiline="true" style="height: 200px; width: 100%" placeholder="Content"></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="color-container">
+                            <div id="bcPicker2" class="color-picker border rounded" style="width: 45px; height: 45px; padding: 5px"></div>
+                        </div>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" onclick="editNote()">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
     </form>
 
@@ -168,6 +192,12 @@
             event.preventDefault();
         });
         $('#bcPicker1').bcPicker({
+            defaultColor: "FFFFFF",
+            colors: [
+                'F08077', 'FFFFFF', 'E5E7EA', 'E2C29E', 'C4EEF7', '9DFFE8', 'C5FF85', 'FFF26A'
+            ]
+        });
+        $('#bcPicker2').bcPicker({
             defaultColor: "FFFFFF",
             colors: [
                 'F08077', 'FFFFFF', 'E5E7EA', 'E2C29E', 'C4EEF7', '9DFFE8', 'C5FF85', 'FFF26A'
@@ -235,7 +265,7 @@
                 url: "index.aspx/AddNote",
                 data: request,
                 success: function (res) {
-                    showMessage(res.d, 'success');
+                    showMessage(res.d, res.d.includes("error") ? 'error' : 'success');
                     $('#txtNoteTitle').val("");
                     $('#txtNoteContent').val("");
                     $('#modalNote').modal('hide');
@@ -263,7 +293,7 @@
                 url: "index.aspx/DeleteNote",
                 data: request,
                 success: function (res) {
-                    showMessage(res.d, 'success');
+                    showMessage(res.d, res.d.includes("error") ? 'error' : 'success');
                     getNotesByCatId(category);
                 },
                 error: function (jqXHR, status, errorThrown) {
@@ -271,6 +301,45 @@
                 }
             });
         };
+
+        function initializeEditModal(id, title, content, highlight, category) {
+            $('#<%=hfNoteId.ClientID%>').val(id);
+            $('#txtEditNoteTitle').val(title);
+            $('#txtEditNoteContent').val(content);
+            $('#bcPicker2')[0].children[0].style.backgroundColor = highlight;
+            $('#modalEditNote').modal('show');
+        }
+        function editNote() {
+            noteId = $('#<%=hfNoteId.ClientID%>').val();
+            var category = 1; //initialize category id = 1 and check if another category is selected --> (1=Uncategorized)
+            if ($('#<%=hfCategoryId.ClientID%>').val() != "") {
+                category = $('#<%=hfCategoryId.ClientID%>').val();
+            }
+            var bgcolor = $.fn.bcPicker.toHex($('#bcPicker2')[0].children[0].style.backgroundColor);
+            var request = JSON.stringify({
+                noteId: noteId,
+                noteTitle: $('#txtEditNoteTitle').val(),
+                noteContent: $('#txtEditNoteContent').val(),
+                noteHighlight: bgcolor
+            });
+            $.ajax({
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                url: "index.aspx/EditNote",
+                data: request,
+                success: function (res) {
+                    showMessage(res.d, res.d.includes("error") ? 'error' : 'success');
+                    $('#txtEditNoteTitle').val("");
+                    $('#txtEditNoteContent').val("");
+                    $('#modalEditNote').modal('hide');
+                    getNotesByCatId(category);
+                },
+                error: function (jqXHR, status, errorThrown) {
+                    showMessage("An error occured. Sorry!", 'error');
+                }
+            });
+        }
 
         function showMessage(msg, type) {
             $.notify(msg, type);

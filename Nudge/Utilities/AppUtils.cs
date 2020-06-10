@@ -170,13 +170,40 @@ namespace Nudge.Utilities {
                 return false;
             }
         }
+
+        public static bool EditNote(int noteId, string noteTitle, string noteContent, string noteHighlight) {
+            try {
+                using (var con = new SqlConnection(getConString())) {
+                    con.Open();
+                    using (var cmd = con.CreateCommand()) {
+                        cmd.CommandText = @"UPDATE  Notes 
+                                            SET     note_content=@noteC, 
+                                                    note_title=@noteT, 
+                                                    note_highlight=@noteH, 
+                                                    last_updated_on=@lastUpdated
+                                            WHERE   note_id=@noteId;";
+
+                        cmd.Parameters.Add(new SqlParameter("@noteId", SqlDbType.Int)).Value = noteId;
+                        cmd.Parameters.Add(new SqlParameter("@noteC", SqlDbType.VarChar, 250)).Value = noteContent;
+                        cmd.Parameters.Add(new SqlParameter("@noteT", SqlDbType.VarChar, 250)).Value = noteTitle;
+                        cmd.Parameters.Add(new SqlParameter("@noteH", SqlDbType.VarChar, 250)).Value = noteHighlight;
+                        cmd.Parameters.Add(new SqlParameter("@lastUpdated", SqlDbType.DateTime, 250)).Value = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
+
+                        cmd.ExecuteNonQuery();
+                    }
+                    con.Close();
+                }
+                return true;
+            } catch (Exception ex) {
+                return false;
+            }
+        }
         #endregion
 
         #region Tags
 
         public static List<tag> getTagsByNoteId(int noteId) {
             var myNotes = new List<tag>();
-            int a = -1;
             try {
                 using (var con = new SqlConnection(getConString())) {
                     con.Open();

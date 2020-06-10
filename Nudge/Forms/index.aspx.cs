@@ -8,6 +8,7 @@ using System.Web;
 using Nudge.Utilities;
 using System.Web.UI.WebControls;
 using Newtonsoft.Json;
+using System.Text;
 
 namespace Nudge.Forms {
 
@@ -31,7 +32,7 @@ namespace Nudge.Forms {
                 DisplayNotes("1");
             }
         }
-
+        
         #endregion
 
         #region Category management methods
@@ -74,13 +75,13 @@ namespace Nudge.Forms {
             string[] childrenList = HttpContext.Current.Session["children"].ToString().Split(',');
             Array.Resize(ref childrenList, childrenList.Length - 1);
 
-            string printedNotes = "";
+            var printedNotes = new StringBuilder();
+
             foreach (var child in childrenList) {
                 var notesByCat = AppUtils.getNotesByCategory(Convert.ToInt32(child), 1);
                 foreach (var note in notesByCat) {
                     var noteTags = AppUtils.getTagsByNoteId(note.noteId);
-                    printedNotes +=
-                            "<div class='col-lg-4 col-sm-12 col-md-6 col-xs-12'>" +
+                    printedNotes.Append("<div class='col-lg-4 col-sm-12 col-md-6 col-xs-12'>" +
                                 "<div class='card' style='background-color: " + note.noteHighlight + ";'>" +
                                     "<div class='card-header' style='background-color: " + note.noteHighlight + "; border: none'>" +
                                         "<h3 class='card-title text-bold'>" + note.noteTitle + "</h3>" +
@@ -93,33 +94,32 @@ namespace Nudge.Forms {
                                     "<div class='card-body'>" +
                                         "<p>" +
                                         note.noteContent +
-                                        "</p>";
+                                        "</p>");
                     foreach (var tag in noteTags) {
-                        printedNotes += "<a href='#'>" + "<span class='border border-secondary rounded p-1'>" + tag.tagName + "</span></a>";
+                        printedNotes.Append("<a href='#'>" + "<span class='border border-secondary rounded p-1'>" + tag.tagName + "</span></a>");
                     }
-                    printedNotes +=
-                                    "</div>" +
+                    printedNotes.Append("</div>" +
                                     "<div class='card-footer' style='border: none; background-color: " + note.noteHighlight + ";'>" +
-                                        "<button type='button' class='btn btn-tool p-1' style='float: right'>"+
-                                        "    <i class='fas fa-ellipsis-v'></i>"+
-                                        "</button>"+
-                                        "<button type='button' class='btn btn-tool p-1' style='float: right'>"+
-                                        "    <i class='fas fa-edit'></i>"+
+                                        "<button type='button' class='btn btn-tool p-1' style='float: right'>" +
+                                        "    <i class='fas fa-ellipsis-v'></i>" +
+                                        "</button>" +
+                                        "<button type='button' onclick='initializeEditModal(" + note.noteId + ", \"" + note.noteTitle + "\", \"" + note.noteContent + "\", \"" + note.noteHighlight + "\", " + note.categoryId + ")' class='btn btn-tool p-1' style='float: right'>" +
+                                        "    <i class='fas fa-edit'></i>" +
                                         "</button>" +
                                         "<button type='button' onclick='deleteNote(" + note.noteId + ")' class='btn btn-tool p-1' style='float: right'>" +
                                         "    <i class='fas fa-trash-alt'></i>" +
                                         "</button>" +
-                                        "<button type='button' class='btn btn-tool p-1' style='float: right'>"+
-                                        "    <i class='fas fa-bookmark'></i>"+
-                                        "</button>"+
-                                    "</div>"+
-                                "</div>"+
-                            "</div>";
+                                        "<button type='button' class='btn btn-tool p-1' style='float: right'>" +
+                                        "    <i class='fas fa-bookmark'></i>" +
+                                        "</button>" +
+                                    "</div>" +
+                                "</div>" +
+                            "</div>");
                 }
             }
             return JsonConvert.SerializeObject(new {
                 errorMsg = "SUCCESS",
-                notesStringResponse = printedNotes,
+                notesStringResponse = printedNotes.ToString(),
                 categoryName = myCategories.First(i => i.categoryId == catId).categoryName,
                 categoryId = catId
             });
@@ -158,7 +158,15 @@ namespace Nudge.Forms {
                 return "Successfully deleted note";
             }
         }
-
+        [WebMethod]
+        public static string EditNote(int noteId, string noteTitle, string noteContent, string noteHighlight) {
+            var res = AppUtils.EditNote(noteId, noteTitle, noteContent, noteHighlight);
+            if (res == false) {
+                return "An error occured.";
+            } else {
+                return "Success";
+            }
+        }
         #endregion
         
     }
