@@ -19,10 +19,15 @@ namespace Nudge.Forms {
         protected void Page_Load(object sender, EventArgs e) {
             if (!IsPostBack) {
                 var myCategories = AppUtils.getCategories(1);
-
+                var root = new Node();
+                root.catName = "root";
+                root.id = 0;
+                root.children = new List<Node>();
+                categories.Add(root);
                 hfStringCategories.Value = "";
                 for (int i = 0; i < myCategories.Count; i++) {   //foreach root node call children recursively
                     if (myCategories[i].parentId == -1) {
+                        callJsTree(myCategories[i], myCategories, root);
                         RecursiveNodeCall(myCategories[i], myCategories);
                         hfStringCategories.Value += "</ul></li>";
                     }
@@ -32,10 +37,54 @@ namespace Nudge.Forms {
                 DisplayNotes("1");
             }
         }
-        
+
         #endregion
 
         #region Category management methods
+
+        public static List<Node> categories = new List<Node>();
+
+        //public List<Node> callJsTree(List<AppUtils.category> myCategories) {
+        //    var finalCategories = new List<Node>();
+        //    var list = myCategories.Where(f => f.parentId == -1);
+        //    foreach (var parent in list) {
+        //        var newNode = new Node();
+        //        newNode.id = parent.categoryId;
+        //        newNode.catName = parent.categoryName;
+        //        finalCategories.Add(newNode);
+        //    }
+        //    foreach (var child in myCategories.Where(f => f.parentId != -1)) {
+        //        var parent = finalCategories.First(i => i.id == child.parentId); //cannot go deeper than level 2, unable to retrieve parent (not in finalCategories list  
+        //        if (parent.children == null) {
+        //            parent.children = new List<Node>();
+        //        }
+        //        var childToAdd = new Node();
+        //        childToAdd.id = child.categoryId;
+        //        childToAdd.catName = child.categoryName;
+        //        parent.children.Add(childToAdd);
+        //    }
+        //    return finalCategories;
+        //}
+
+        public void callJsTree(AppUtils.category node, List<AppUtils.category> myCategories, Node parent) {
+            var children = AppUtils.getChildren(node, myCategories);
+            var newParent = addNode(node, parent);
+            //----------
+            for (var i = 0; i < children.Count; i++) {
+                callJsTree(children[i], myCategories, newParent); //call children of current node
+            }
+        }
+        
+        public Node addNode(AppUtils.category child, Node parent) {
+            var newChild = new Node();
+            newChild.catName = child.categoryName;
+            newChild.id = child.categoryId;
+            if (parent.children == null) {
+                parent.children = new List<Node>();
+            }
+            parent.children.Add(newChild);
+            return newChild;
+        }
 
         public void RecursiveNodeCall(AppUtils.category node, List<AppUtils.category> myCategories) {
             var children = AppUtils.getChildren(node, myCategories);
@@ -45,7 +94,7 @@ namespace Nudge.Forms {
                 hfStringCategories.Value += "</ul></li>";
             }
         }
-        
+
         public void PrintCategory(AppUtils.category node, bool chevron) {
             hfStringCategories.Value += "<li class='nav-item has-treeview'>" +
                                 "<a id=\"" + node.categoryId + "\" href='#' class='nav-link'> " +
@@ -168,6 +217,27 @@ namespace Nudge.Forms {
             }
         }
         #endregion
-        
+
+
+        public class Node {
+            public string catName { get; set; }
+            public decimal id { get; set; }
+            public NodeState state { get; set; }
+            public List<Node> children { get; set; }
+        }
+
+        public class NodeState {
+            public bool opened { get; set; }
+            public bool disabled { get; set; }
+            public bool selected { get; set; }
+
+            public NodeState(bool opened = true,
+                             bool disabled = false,
+                             bool selected = false) {
+                this.opened = opened;
+                this.disabled = disabled;
+                this.selected = selected;
+            }
+        }
     }
 }

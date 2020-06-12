@@ -34,7 +34,7 @@ namespace Nudge.Utilities {
                                             ) 
                                             SELECT		category_id, category_name, parent_category, depth, path
                                             FROM		final_categories 
-                                            ORDER BY	parent_category";
+                                            ORDER BY	depth";
                         cmd.Parameters.Add(new SqlParameter("@uid", SqlDbType.Int)).Value = user_id;
 
                         using (var dr = cmd.ExecuteReader()) {
