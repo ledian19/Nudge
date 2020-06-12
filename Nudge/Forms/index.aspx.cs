@@ -19,21 +19,18 @@ namespace Nudge.Forms {
         protected void Page_Load(object sender, EventArgs e) {
             if (!IsPostBack) {
                 var myCategories = AppUtils.getCategories(1);
+                var categoriesList = new List<Node>();
                 var root = new Node();
-                root.catName = "root";
-                root.id = 0;
+                root.text = "Notes";
+                root.id = 1;
                 root.children = new List<Node>();
-                categories.Add(root);
-                hfStringCategories.Value = "";
+                categoriesList.Add(root);
                 for (int i = 0; i < myCategories.Count; i++) {   //foreach root node call children recursively
-                    if (myCategories[i].parentId == -1) {
+                    if (myCategories[i].parentId == -1 && myCategories[i].categoryId != 1) {
                         callJsTree(myCategories[i], myCategories, root);
-                        RecursiveNodeCall(myCategories[i], myCategories);
-                        hfStringCategories.Value += "</ul></li>";
                     }
                 }
-                divInsertHtml.InnerHtml = hfStringCategories.Value;
-                hfStringCategories.Value = "";
+                hfTreeData.Value = JsonConvert.SerializeObject(categoriesList);
                 DisplayNotes("1");
             }
         }
@@ -42,42 +39,17 @@ namespace Nudge.Forms {
 
         #region Category management methods
 
-        public static List<Node> categories = new List<Node>();
-
-        //public List<Node> callJsTree(List<AppUtils.category> myCategories) {
-        //    var finalCategories = new List<Node>();
-        //    var list = myCategories.Where(f => f.parentId == -1);
-        //    foreach (var parent in list) {
-        //        var newNode = new Node();
-        //        newNode.id = parent.categoryId;
-        //        newNode.catName = parent.categoryName;
-        //        finalCategories.Add(newNode);
-        //    }
-        //    foreach (var child in myCategories.Where(f => f.parentId != -1)) {
-        //        var parent = finalCategories.First(i => i.id == child.parentId); //cannot go deeper than level 2, unable to retrieve parent (not in finalCategories list  
-        //        if (parent.children == null) {
-        //            parent.children = new List<Node>();
-        //        }
-        //        var childToAdd = new Node();
-        //        childToAdd.id = child.categoryId;
-        //        childToAdd.catName = child.categoryName;
-        //        parent.children.Add(childToAdd);
-        //    }
-        //    return finalCategories;
-        //}
-
         public void callJsTree(AppUtils.category node, List<AppUtils.category> myCategories, Node parent) {
+            var parentToBe = addNode(node, parent);
             var children = AppUtils.getChildren(node, myCategories);
-            var newParent = addNode(node, parent);
-            //----------
             for (var i = 0; i < children.Count; i++) {
-                callJsTree(children[i], myCategories, newParent); //call children of current node
+                callJsTree(children[i], myCategories, parentToBe); //call children of current node
             }
         }
         
         public Node addNode(AppUtils.category child, Node parent) {
             var newChild = new Node();
-            newChild.catName = child.categoryName;
+            newChild.text = child.categoryName;
             newChild.id = child.categoryId;
             if (parent.children == null) {
                 parent.children = new List<Node>();
@@ -85,31 +57,7 @@ namespace Nudge.Forms {
             parent.children.Add(newChild);
             return newChild;
         }
-
-        public void RecursiveNodeCall(AppUtils.category node, List<AppUtils.category> myCategories) {
-            var children = AppUtils.getChildren(node, myCategories);
-            PrintCategory(node, children.Count == 0 ? false : true);
-            for (var i = 0; i < children.Count; i++) {
-                RecursiveNodeCall(children[i], myCategories);
-                hfStringCategories.Value += "</ul></li>";
-            }
-        }
-
-        public void PrintCategory(AppUtils.category node, bool chevron) {
-            hfStringCategories.Value += "<li class='nav-item has-treeview'>" +
-                                "<a id=\"" + node.categoryId + "\" href='#' class='nav-link'> " +
-                                    "<i class='nav-icon fas fa-copy'></i>" +
-                                    "<p style='color: black; padding-left: 10px'>" +
-                                        node.categoryName +
-                                        (chevron == false ? "" : ("<span class='glyphicon glyphicon-chevron-left' aria-hidden='true'></span>" +
-                                        "<svg class='right bi bi-caret-down-fill' width='1em' height='1em' viewBox='0 0 16 16' fill='currentColor' xmlns='http://www.w3.org/2000/svg'>" +
-                                            "<path d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 01.753 1.659l-4.796 5.48a1 1 0 01-1.506 0z'/>" +
-                                        "</svg>")) +
-                                    "</p>" +
-                                "</a>" +
-                               "<ul class='nav nav-treeview'>";
-        }
-
+        
         #endregion
 
         #region Note management WebMethods
@@ -220,7 +168,7 @@ namespace Nudge.Forms {
 
 
         public class Node {
-            public string catName { get; set; }
+            public string text { get; set; }
             public decimal id { get; set; }
             public NodeState state { get; set; }
             public List<Node> children { get; set; }

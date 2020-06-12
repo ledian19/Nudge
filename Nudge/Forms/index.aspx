@@ -10,7 +10,8 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="../src/CSS/bcPicker.css">
-    <link rel="stylesheet" href="../Add-ons/CSS/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="../src/CSS/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="../src/JsTree/style.min.css">
     <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
     <link rel="stylesheet" href="../src/CSS/adminlte.min.css">
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
@@ -24,6 +25,15 @@
             color: black;
         }
     </style>
+    <style type="text/css">
+        .jstree li > a > .jstree-icon {  
+            background: url("/src/images/folder.png");
+            width: 32px;
+            height: 29px;
+            padding-top: 5px;
+        } 
+    </style>
+
 </head>
 
 <body onload="initializeNotes()" class="hold-transition sidebar-mini sidebar-collapse">
@@ -32,7 +42,7 @@
             <!-- Navbar -->
             <nav style="border: none" class="main-header navbar navbar-expand navbar-white navbar-light">
 
-                <asp:HiddenField runat="server" ID="hfStringCategories" />
+                <asp:HiddenField runat="server" ID="hfTreeData" />
                 <asp:HiddenField runat="server" ID="hfCategoryId" />
                 <asp:HiddenField runat="server" ID="hfNoteId" />
                 
@@ -81,7 +91,7 @@
                     <!-- Sidebar Menu -->
                     <nav class="mt-2">
                         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                            <div runat="server" id="divInsertHtml">
+                            <div runat="server" id="treeContainer">
                             </div>
                             <li class="nav-header">LABELS</li>
                             <li class="nav-item">
@@ -194,6 +204,8 @@
     <script type="text/javascript" src="../src/JS/bcPicker.js"></script>
     <script type="text/javascript" src="../src/JS/Notify/notify.min.js"></script>
     <script type="text/javascript" src="../src/JS/Notify/notify.js"></script>
+    <script type="text/javascript" src="../src/JsTree/jstree.min.js"></script>
+    <script type="text/javascript" src="../src/JS/Notify/notify.js"></script>
 
     <script>
         //prevent image button from submiting (default behaviour)
@@ -212,6 +224,67 @@
                 'F08077', 'FFFFFF', 'E5E7EA', 'E2C29E', 'C4EEF7', '9DFFE8', 'C5FF85', 'FFF26A'
             ]
         });
+
+
+
+        //------------------------------------
+
+        $(document).ready(function () {
+            var treeData = $("#<%=hfTreeData.ClientID%>").val();
+            if (!treeData) {
+                return;
+            }
+
+            $("#treeContainer").jstree({
+                'core': {
+                    "data": JSON.parse(treeData),
+                    "themes": {
+                        "dots": false,
+                        "icons": true
+                    },
+                },
+                'types': {
+                    'types' : {
+                        'file' : {
+                            'icon' : {
+                                'image' : 'src/images/folder.png'
+                            }
+                        },
+                        'default' : {
+                            'icon' : {
+                                'image': 'src/images/folder.png'
+                            },
+                            'valid_children' : 'default'
+                        }
+                    }
+
+                }
+            });
+
+            $('#jstree')
+            $("#treeContainer").on(
+                "select_node.jstree", function (evt, data) {
+                    getNotesByCatId(data.node.id);
+                }
+            );
+            $('#treeContainer').on(
+                "check_node.jstree uncheck_node.jstree", function (e, data) {
+                    if ($.jstree.reference('#treeContainer').get_checked().length == 0) {
+                        $("#div_button_delete").fadeOut(500);
+                    } else {
+                        $("#div_button_delete").fadeIn(500);
+                        getCheckedNodes();
+                        return false;
+                    }
+                });
+        });
+
+
+
+        //------------------------------------
+
+
+
 
         function initializeNotes() {
             getNotesByCatId(1);
