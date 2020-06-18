@@ -12,16 +12,28 @@
     <link rel="stylesheet" href="../src/CSS/bcPicker.css">
     <link rel="stylesheet" href="../src/CSS/fontawesome/css/all.min.css">
     <link rel="stylesheet" href="../src/JsTree/style.min.css">
+    <link rel="stylesheet" href="../src/plugins/popover/css/bootstrap-popover-x.min.css">
+    <link rel="stylesheet" href="../src/plugins/popover/css/bootstrap-popover-x.css">
+    <link rel="stylesheet" href="../src/plugins/summernote/summernote.min.css">
     <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
     <link rel="stylesheet" href="../src/CSS/adminlte.min.css">
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     <style>
-        .nav-link:hover{
+        .nav-link:hover {
             background-color: rgba(0,0,0,.1);
         }
-        .nav-icon.fas.fa-copy{
+
+        .nav-icon.fas.fa-copy {
             color: black;
+        }
+
+        .note-editor .note-editable {
+            line-height: 0.3;
+        }
+
+        .card-body p {
+            margin-bottom: 0px;
         }
     </style>
 
@@ -36,7 +48,7 @@
                 <asp:HiddenField runat="server" ID="hfTreeData" />
                 <asp:HiddenField runat="server" ID="hfCategoryId" />
                 <asp:HiddenField runat="server" ID="hfNoteId" />
-                
+
                 <!-- Left navbar links -->
                 <ul class="navbar-nav">
                     <li class="nav-item">
@@ -88,8 +100,11 @@
                                     <p class="text">Add category</p>
                                 </a>
                             </li>
+
                             <div runat="server" id="treeContainer">
+
                             </div>
+
                             <li class="nav-header">LABELS</li>
                             <li class="nav-item">
                                 <a href="#" class="nav-link">
@@ -133,7 +148,6 @@
                 <section class="content">
                     <div class="container-fluid">
                         <div class="row" id="divNotes" runat="server">
-
                         </div>
                     </div>
                 </section>
@@ -152,7 +166,7 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <textarea class="form-control" id="txtNoteContent" aria-multiline="true" style="height: 200px; width: 100%" placeholder="Content"></textarea>
+                        <div id="txtAddModal"></div>
                     </div>
                     <div class="modal-footer">
                         <div class="color-container">
@@ -165,8 +179,8 @@
             </div>
         </div>
         <!-- Edit Modal -->
-        <div class="modal fade" id="modalEditNote" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
+        <div class="modal fade bd-example-modal-lg" id="modalEditNote" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <input type="text" id="txtEditNoteTitle" class="form-control" placeholder="Title" />
@@ -175,7 +189,7 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <textarea class="form-control" id="txtEditNoteContent" aria-multiline="true" style="height: 200px; width: 100%" placeholder="Content"></textarea>
+                        <textarea class="form-control" id="txtEditModal" aria-multiline="true" style="height: 200px; width: 100%" placeholder="Content"></textarea>
                     </div>
                     <div class="modal-footer">
                         <div class="color-container">
@@ -187,9 +201,8 @@
                 </div>
             </div>
         </div>
-
+                    
     </form>
-
 
     <!-- jQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -203,6 +216,8 @@
     <script type="text/javascript" src="../src/JS/Notify/notify.js"></script>
     <script type="text/javascript" src="../src/JsTree/jstree.min.js"></script>
     <script type="text/javascript" src="../src/JS/Notify/notify.js"></script>
+    <script type="text/javascript" src="../src/plugins/summernote/summernote.min.js"></script>
+    <script type="text/javascript" src="../src/plugins/popover/js/bootstrap-popover-x.js"></script>
 
     <script>
 
@@ -227,7 +242,6 @@
             ]
         });
 
-        //TreeContainer JsTree Plugin
         $(document).ready(function () {
             var treeData = $("#<%=hfTreeData.ClientID%>").val();
             if (!treeData) {
@@ -241,7 +255,7 @@
                         "icons": true
                     }
                 },
-                plugins : [ "wholerow" ]
+                plugins: ["wholerow"]
             });
             $('#jstree')
             $("#treeContainer").on(
@@ -249,6 +263,22 @@
                     getNotesByCatId(data.node.id);
                 }
             );
+            $('#txtAddModal').summernote({
+                toolbar: [
+                  ['style', ['style', 'bold', 'italic', 'underline']],
+                  ['font', ['strikethrough']],
+                  ['fontsize', ['fontsize']],
+                  ['para', ['ul', 'ol', 'paragraph']],
+                ]
+            });
+            $('#txtEditModal').summernote({
+                toolbar: [
+                  ['style', ['style', 'bold', 'italic', 'underline']],
+                  ['font', ['strikethrough']],
+                  ['fontsize', ['fontsize']],
+                  ['para', ['ul', 'ol', 'paragraph']],
+                ]
+            });
         });
 
         $(".nav-link.active").click(function () {
@@ -298,7 +328,7 @@
             var request = JSON.stringify({
                 catId: category,
                 noteTitle: $('#txtNoteTitle').val(),
-                noteContent: someText = $('#txtNoteContent').val().replace(/(\r\n|\n|\r)/gm,"<br/>"),
+                noteContent: someText = $('#txtAddModal').summernote('code'),
                 noteColor: bgcolor
             });
             $.ajax({
@@ -310,7 +340,7 @@
                 success: function (res) {
                     showMessage(res.d, res.d.includes("error") ? 'error' : 'success');
                     $('#txtNoteTitle').val("");
-                    $('#txtNoteContent').val("");
+                    $('#txtAddModal').val("");
                     $('#modalNote').modal('hide');
                     getNotesByCatId(category);
                 },
@@ -346,10 +376,9 @@
         };
 
         function initializeEditModal(id, title, content, highlight, category) {
-            var regex = /<br\s*[\/]?>/gi;
             $('#<%=hfNoteId.ClientID%>').val(id);
             $('#txtEditNoteTitle').val(title);
-            $('#txtEditNoteContent').val(content.replace(regex, "\n"));
+            $('#txtEditModal').summernote('code', content);
             $('#bcPicker2')[0].children[0].style.backgroundColor = highlight;
             $('#modalEditNote').modal('show');
         }
@@ -363,7 +392,7 @@
             var request = JSON.stringify({
                 noteId: noteId,
                 noteTitle: $('#txtEditNoteTitle').val(),
-                noteContent: $('#txtEditNoteContent').val(),
+                noteContent: $('#txtEditModal').summernote('code'),
                 noteHighlight: bgcolor
             });
             $.ajax({
@@ -375,7 +404,7 @@
                 success: function (res) {
                     showMessage(res.d, res.d.includes("error") ? 'error' : 'success');
                     $('#txtEditNoteTitle').val("");
-                    $('#txtEditNoteContent').val("");
+                    $('#txtEditModal').val("");
                     $('#modalEditNote').modal('hide');
                     getNotesByCatId(category);
                 },
