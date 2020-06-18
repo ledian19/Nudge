@@ -17,21 +17,12 @@
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     <style>
-        
         .nav-link:hover{
             background-color: rgba(0,0,0,.1);
         }
         .nav-icon.fas.fa-copy{
             color: black;
         }
-    </style>
-    <style type="text/css">
-        .jstree li > a > .jstree-icon {  
-            background: url("/src/images/folder.png");
-            width: 32px;
-            height: 29px;
-            padding-top: 5px;
-        } 
     </style>
 
 </head>
@@ -91,6 +82,12 @@
                     <!-- Sidebar Menu -->
                     <nav class="mt-2">
                         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                                    <p class="text">Add category</p>
+                                </a>
+                            </li>
                             <div runat="server" id="treeContainer">
                             </div>
                             <li class="nav-header">LABELS</li>
@@ -208,6 +205,11 @@
     <script type="text/javascript" src="../src/JS/Notify/notify.js"></script>
 
     <script>
+
+        function initializeNotes() {
+            getNotesByCatId(1);
+        }
+
         //prevent image button from submiting (default behaviour)
         $('#btnAdd').click(function (event) {
             event.preventDefault();
@@ -225,70 +227,29 @@
             ]
         });
 
-
-
-        //------------------------------------
-
+        //TreeContainer JsTree Plugin
         $(document).ready(function () {
             var treeData = $("#<%=hfTreeData.ClientID%>").val();
             if (!treeData) {
                 return;
             }
-
             $("#treeContainer").jstree({
-                'core': {
+                core: {
                     "data": JSON.parse(treeData),
                     "themes": {
                         "dots": false,
                         "icons": true
-                    },
-                },
-                'types': {
-                    'types' : {
-                        'file' : {
-                            'icon' : {
-                                'image' : 'src/images/folder.png'
-                            }
-                        },
-                        'default' : {
-                            'icon' : {
-                                'image': 'src/images/folder.png'
-                            },
-                            'valid_children' : 'default'
-                        }
                     }
-
-                }
+                },
+                plugins : [ "wholerow" ]
             });
-
             $('#jstree')
             $("#treeContainer").on(
                 "select_node.jstree", function (evt, data) {
                     getNotesByCatId(data.node.id);
                 }
             );
-            $('#treeContainer').on(
-                "check_node.jstree uncheck_node.jstree", function (e, data) {
-                    if ($.jstree.reference('#treeContainer').get_checked().length == 0) {
-                        $("#div_button_delete").fadeOut(500);
-                    } else {
-                        $("#div_button_delete").fadeIn(500);
-                        getCheckedNodes();
-                        return false;
-                    }
-                });
         });
-
-
-
-        //------------------------------------
-
-
-
-
-        function initializeNotes() {
-            getNotesByCatId(1);
-        }
 
         $(".nav-link.active").click(function () {
             var catid = $(this).attr("id");
@@ -358,7 +319,7 @@
                 }
             });
         }
-        
+
         function deleteNote(id) {
             var category = 1; //initialize category id = 1 and check if another category is selected --> (1=Uncategorized)
             if ($('#<%=hfCategoryId.ClientID%>').val() != "") {

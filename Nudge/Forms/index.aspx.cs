@@ -23,6 +23,7 @@ namespace Nudge.Forms {
                 var root = new Node();
                 root.text = "Notes";
                 root.id = 1;
+                root.icon = "fas fa-folder-open pt-0";
                 root.children = new List<Node>();
                 categoriesList.Add(root);
                 for (int i = 0; i < myCategories.Count; i++) {   //foreach root node call children recursively
@@ -51,6 +52,7 @@ namespace Nudge.Forms {
             var newChild = new Node();
             newChild.text = child.categoryName;
             newChild.id = child.categoryId;
+            newChild.icon = "fas fa-folder-open pt-0";
             if (parent.children == null) {
                 parent.children = new List<Node>();
             }
@@ -170,6 +172,7 @@ namespace Nudge.Forms {
         public class Node {
             public string text { get; set; }
             public decimal id { get; set; }
+            public string icon { get; set; }
             public NodeState state { get; set; }
             public List<Node> children { get; set; }
         }
