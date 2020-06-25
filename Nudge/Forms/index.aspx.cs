@@ -15,7 +15,7 @@ namespace Nudge.Forms {
     public partial class index : Page {
 
         #region Events
-        
+
         protected void Page_Load(object sender, EventArgs e) {
             if (!IsPostBack) {
                 var myCategories = AppUtils.getCategories(1);
@@ -47,7 +47,7 @@ namespace Nudge.Forms {
                 callJsTree(children[i], myCategories, parentToBe); //call children of current node
             }
         }
-        
+
         public Node addNode(AppUtils.category child, Node parent) {
             var newChild = new Node();
             newChild.text = child.categoryName;
@@ -59,7 +59,7 @@ namespace Nudge.Forms {
             parent.children.Add(newChild);
             return newChild;
         }
-        
+
         #endregion
 
         #region Note management WebMethods

@@ -97,7 +97,7 @@
                             <li class="nav-item">
                                 <a href="#" class="nav-link">
                                     <i class="fa fa-plus-circle" aria-hidden="true"></i>
-                                    <p class="text">Add category</p>
+                                    <p class="text">Add</p>
                                 </a>
                             </li>
 
@@ -201,7 +201,7 @@
                 </div>
             </div>
         </div>
-                    
+
     </form>
 
     <!-- jQuery -->
