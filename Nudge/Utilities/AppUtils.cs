@@ -46,11 +46,36 @@ namespace Nudge.Utilities {
                                 myCategories.Add(currentCategory);
                             }
                         }
+                        myCategories.Insert(0, new category {
+                            categoryId = 1,
+                            categoryName = "Notes"
+                        });
                         return myCategories;
                     }
                 }
             } catch (Exception ex) {
                 return myCategories;
+            }
+        }
+
+        public static bool AddCategory(int parentId, string catName, int userId) {
+            try {
+                using (var con = new SqlConnection(getConString())) {
+                    con.Open();
+                    using (var cmd = con.CreateCommand()) {
+                        cmd.CommandText = @"INSERT INTO     Categories (parent_category, category_name, user_id)
+                                            VALUES          (@parentId, @catName, @userId);";
+
+                        cmd.Parameters.Add(new SqlParameter("@parentId", SqlDbType.Int)).Value = parentId;
+                        cmd.Parameters.Add(new SqlParameter("@catName", SqlDbType.VarChar, 200)).Value = catName;
+                        cmd.Parameters.Add(new SqlParameter("@userId", SqlDbType.Int)).Value = userId;
+
+                        cmd.ExecuteNonQuery();
+                        return true;
+                    }
+                }
+            } catch (Exception ex) {
+                return false;
             }
         }
 

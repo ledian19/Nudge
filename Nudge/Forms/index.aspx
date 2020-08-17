@@ -15,10 +15,12 @@
     <link rel="stylesheet" href="../src/plugins/popover/css/bootstrap-popover-x.min.css">
     <link rel="stylesheet" href="../src/plugins/popover/css/bootstrap-popover-x.css">
     <link rel="stylesheet" href="../src/plugins/summernote/summernote.min.css">
+    <link rel="stylesheet" href="../src/plugins/alertifyjs/css/alertify.min.css">
+    <link rel="stylesheet" href="../src/plugins/alertifyjs/css/themes/default.min.css">
+    <link rel="stylesheet" href="../src/CSS/bootstrap.min.css">
     <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
     <link rel="stylesheet" href="../src/CSS/adminlte.min.css">
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     <style>
         .nav-link:hover {
             background-color: rgba(0,0,0,.1);
@@ -52,7 +54,7 @@
                 <!-- Left navbar links -->
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+                        <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars text-dark"></i></a>
                     </li>
                 </ul>
 
@@ -63,7 +65,7 @@
                             <input class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">
                             <div class="input-group-append">
                                 <button class="btn btn-navbar" type="submit">
-                                    <i class="fas fa-search"></i>
+                                    <i class="fas fa-search text-dark"></i>
                                 </button>
                             </div>
                         </div>
@@ -95,7 +97,7 @@
                     <nav class="mt-2">
                         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                             <li class="nav-item">
-                                <a href="#" class="nav-link">
+                                <a id="btnAddCategory" data-toggle="popover" title="Popover title" href="#" class="nav-link">
                                     <i class="fa fa-plus-circle" aria-hidden="true"></i>
                                     <p class="text">Add category</p>
                                 </a>
@@ -201,7 +203,18 @@
                 </div>
             </div>
         </div>
-                    
+        
+        <div id="PopoverContent" class="d-none">
+            <input type="text" class="form-control p-1 mb-1" aria-describedby="button-addon1">
+            <select name="test" id="categories" class="form-control p-1 mb-1">
+                <option value="">adsa</option>
+                <option value="">adsa</option>
+                <option value="">adsa</option>
+                <option value="">adsa</option>
+            </select>
+            <button type="button" class="btn-block p-1">Submit</button>
+        </div>
+ 
     </form>
 
     <!-- jQuery -->
@@ -218,30 +231,11 @@
     <script type="text/javascript" src="../src/JS/Notify/notify.js"></script>
     <script type="text/javascript" src="../src/plugins/summernote/summernote.min.js"></script>
     <script type="text/javascript" src="../src/plugins/popover/js/bootstrap-popover-x.js"></script>
+    <script type="text/javascript" src="../src/plugins/alertifyjs/alertify.js"></script>
+    <script type="text/javascript" src="../src/plugins/alertifyjs/alertify.min.js"></script>
 
     <script>
-
-        function initializeNotes() {
-            getNotesByCatId(1);
-        }
-
-        //prevent image button from submiting (default behaviour)
-        $('#btnAdd').click(function (event) {
-            event.preventDefault();
-        });
-        $('#bcPicker1').bcPicker({
-            defaultColor: "F08077",
-            colors: [
-                'F08077', 'FFFFFF', 'E5E7EA', 'E2C29E', 'C4EEF7', '9DFFE8', 'C5FF85', 'FFF26A'
-            ]
-        });
-        $('#bcPicker2').bcPicker({
-            defaultColor: "F08077",
-            colors: [
-                'F08077', 'FFFFFF', 'E5E7EA', 'E2C29E', 'C4EEF7', '9DFFE8', 'C5FF85', 'FFF26A'
-            ]
-        });
-
+        
         $(document).ready(function () {
             var treeData = $("#<%=hfTreeData.ClientID%>").val();
             if (!treeData) {
@@ -264,6 +258,7 @@
                 }
             );
             $('#txtAddModal').summernote({
+                height: 300,
                 toolbar: [
                   ['style', ['style', 'bold', 'italic', 'underline']],
                   ['font', ['strikethrough']],
@@ -272,6 +267,7 @@
                 ]
             });
             $('#txtEditModal').summernote({
+                height: 300,
                 toolbar: [
                   ['style', ['style', 'bold', 'italic', 'underline']],
                   ['font', ['strikethrough']],
@@ -279,17 +275,52 @@
                   ['para', ['ul', 'ol', 'paragraph']],
                 ]
             });
+
+            $('#btnAddCategory').popover({
+                content: $('#myPopover').html(),
+                trigger: "click"
+            });
         });
 
-        $(".nav-link.active").click(function () {
-            var catid = $(this).attr("id");
-            getNotesByCatId(catid);
+        $(function () {
+            $('[data-toggle="popover"]').popover({
+                container: 'body',
+                html: true,
+                placement: 'bottom',
+                sanitize: false,
+                content: function () {
+                    return $('#PopoverContent').html()
+                }
+            })
+        });
+
+        function initializeNotes() {
+            getNotesByCatId(1);
+        }
+
+        //prevent image button from submiting (default behaviour)
+        $('#btnAdd').click(function (event) {
+            event.preventDefault();
+        });
+        $('#bcPicker1').bcPicker({
+            defaultColor: "F08077",
+            colors: [
+                'F08077', 'FFFFFF', 'E5E7EA', 'E2C29E', 'C4EEF7', '9DFFE8', 'C5FF85', 'FFF26A'
+            ]
+        });
+        $('#bcPicker2').bcPicker({
+            defaultColor: "F08077",
+            colors: [
+                'F08077', 'FFFFFF', 'E5E7EA', 'E2C29E', 'C4EEF7', '9DFFE8', 'C5FF85', 'FFF26A'
+            ]
         });
 
         function getNotesByCatId(catId) {
             bindNodes(catId, function (errorMsg, notesStringResponse, categoryName, hfCategoryId) {
                 if (errorMsg != 'SUCCESS') {
-                    showMessage(errorMsg, 'error');
+                    alertify.alert(errorMsg, function () {
+                        alertify.error("Error");
+                    });
                     return;
                 }
                 $("#<%=divNotes.ClientID%>").hide();
@@ -315,7 +346,9 @@
                     callback(data.errorMsg, data.notesStringResponse, data.categoryName, data.categoryId);
                 },
                 error: function (jqXHR, status, errorThrown) {
-                    showMessage("An error occured. Sorry!", 'error');
+                    alertify.alert("An error occured. Sorry!", function () {
+                        alertify.error("Error");
+                    });
                 }
             });
         }
@@ -338,14 +371,22 @@
                 url: "index.aspx/AddNote",
                 data: request,
                 success: function (res) {
-                    showMessage(res.d, res.d.includes("error") ? 'error' : 'success');
+                    alertify.alert(res.d, function () {
+                        if (res.d.includes("error")) {
+                            alertify.error("Error");
+                            return;
+                        }
+                        alertify.success("Success");
+                    });
                     $('#txtNoteTitle').val("");
                     $('#txtAddModal').val("");
                     $('#modalNote').modal('hide');
                     getNotesByCatId(category);
                 },
                 error: function (jqXHR, status, errorThrown) {
-                    showMessage("An error occured. Sorry!", 'error');
+                    alertify.alert("An error occured. Sorry!.", function () {
+                          alertify.error('Error');
+                    });
                 }
             });
         }
@@ -366,11 +407,20 @@
                 url: "index.aspx/DeleteNote",
                 data: request,
                 success: function (res) {
-                    showMessage(res.d, res.d.includes("error") ? 'error' : 'success');
+                    alertify.alert(res.d, function () {
+                        if (res.d.includes("error")) {
+                            alertify.error("Error");
+                            return;
+                        }
+                        alertify.success("Success");
+                    });
+
                     getNotesByCatId(category);
                 },
                 error: function (jqXHR, status, errorThrown) {
-                    showMessage("An error occured. Sorry!", 'error');
+                    alertify.alert("An error occured. Sorry!", function () {
+                        alertify.error("Error");
+                    });
                 }
             });
         };
@@ -402,14 +452,22 @@
                 url: "index.aspx/EditNote",
                 data: request,
                 success: function (res) {
-                    showMessage(res.d, res.d.includes("error") ? 'error' : 'success');
+                    alertify.alert(res.d, function () {
+                        if (res.d.includes("error")) {
+                            alertify.error("Error");
+                            return;
+                        }
+                        alertify.success("Success");
+                    });
                     $('#txtEditNoteTitle').val("");
                     $('#txtEditModal').val("");
                     $('#modalEditNote').modal('hide');
                     getNotesByCatId(category);
                 },
                 error: function (jqXHR, status, errorThrown) {
-                    showMessage("An error occured. Sorry!", 'error');
+                    alertify.alert("An error occured. Sorry!", function () {
+                        alertify.error("Error");
+                    });
                 }
             });
         }
