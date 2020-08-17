@@ -168,7 +168,6 @@ namespace Nudge.Forms {
         }
         #endregion
 
-
         public class Node {
             public string text { get; set; }
             public decimal id { get; set; }
