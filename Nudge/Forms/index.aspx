@@ -37,6 +37,10 @@
         .card-body p {
             margin-bottom: 0px;
         }
+
+        .ajs-content{
+            text-align: center;
+        }
     </style>
 
 </head>
@@ -318,7 +322,7 @@
         function getNotesByCatId(catId) {
             bindNodes(catId, function (errorMsg, notesStringResponse, categoryName, hfCategoryId) {
                 if (errorMsg != 'SUCCESS') {
-                    alertify.alert(errorMsg, function () {
+                    alertify.alert("", errorMsg, function () {
                         alertify.error("Error");
                     });
                     return;
@@ -346,7 +350,7 @@
                     callback(data.errorMsg, data.notesStringResponse, data.categoryName, data.categoryId);
                 },
                 error: function (jqXHR, status, errorThrown) {
-                    alertify.alert("An error occured. Sorry!", function () {
+                    alertify.alert("", "An error occured. Sorry!", function () {
                         alertify.error("Error");
                     });
                 }
@@ -371,7 +375,7 @@
                 url: "index.aspx/AddNote",
                 data: request,
                 success: function (res) {
-                    alertify.alert(res.d, function () {
+                    alertify.alert("", res.d, function () {
                         if (res.d.includes("error")) {
                             alertify.error("Error");
                             return;
@@ -384,7 +388,7 @@
                     getNotesByCatId(category);
                 },
                 error: function (jqXHR, status, errorThrown) {
-                    alertify.alert("An error occured. Sorry!.", function () {
+                    alertify.alert("", "An error occured. Sorry!.", function () {
                           alertify.error('Error');
                     });
                 }
@@ -407,7 +411,7 @@
                 url: "index.aspx/DeleteNote",
                 data: request,
                 success: function (res) {
-                    alertify.alert(res.d, function () {
+                    alertify.alert("", res.d, function () {
                         if (res.d.includes("error")) {
                             alertify.error("Error");
                             return;
@@ -418,7 +422,7 @@
                     getNotesByCatId(category);
                 },
                 error: function (jqXHR, status, errorThrown) {
-                    alertify.alert("An error occured. Sorry!", function () {
+                    alertify.alert("", "An error occured. Sorry!", function () {
                         alertify.error("Error");
                     });
                 }
@@ -452,7 +456,7 @@
                 url: "index.aspx/EditNote",
                 data: request,
                 success: function (res) {
-                    alertify.alert(res.d, function () {
+                    alertify.alert("", res.d, function () {
                         if (res.d.includes("error")) {
                             alertify.error("Error");
                             return;
@@ -465,7 +469,7 @@
                     getNotesByCatId(category);
                 },
                 error: function (jqXHR, status, errorThrown) {
-                    alertify.alert("An error occured. Sorry!", function () {
+                    alertify.alert("", "An error occured. Sorry!", function () {
                         alertify.error("Error");
                     });
                 }
