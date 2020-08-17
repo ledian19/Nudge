@@ -15,7 +15,7 @@ namespace Nudge.Forms {
     public partial class index : Page {
 
         #region Events
-
+        
         protected void Page_Load(object sender, EventArgs e) {
             if (!IsPostBack) {
                 var myCategories = AppUtils.getCategories(1);
@@ -23,12 +23,12 @@ namespace Nudge.Forms {
                 var root = new Node();
                 root.text = "Notes";
                 root.id = 1;
-                root.icon = "fas fa-folder-open pt-0";
+                root.icon = "fas fa-folder-open text-dark pt-0";
                 root.children = new List<Node>();
                 categoriesList.Add(root);
                 for (int i = 0; i < myCategories.Count; i++) {   //foreach root node call children recursively
                     if (myCategories[i].parentId == -1 && myCategories[i].categoryId != 1) {
-                        callJsTree(myCategories[i], myCategories, root);
+                        CallJsTree(myCategories[i], myCategories, root);
                     }
                 }
                 hfTreeData.Value = JsonConvert.SerializeObject(categoriesList);
@@ -40,26 +40,34 @@ namespace Nudge.Forms {
 
         #region Category management methods
 
-        public void callJsTree(AppUtils.category node, List<AppUtils.category> myCategories, Node parent) {
-            var parentToBe = addNode(node, parent);
+        public void CallJsTree(AppUtils.category node, List<AppUtils.category> myCategories, Node parent) {
+            var parentToBe = AddNode(node, parent);
             var children = AppUtils.getChildren(node, myCategories);
             for (var i = 0; i < children.Count; i++) {
-                callJsTree(children[i], myCategories, parentToBe); //call children of current node
+                CallJsTree(children[i], myCategories, parentToBe); //call children of current node
             }
         }
-
-        public Node addNode(AppUtils.category child, Node parent) {
+        public Node AddNode(AppUtils.category child, Node parent) {
             var newChild = new Node();
             newChild.text = child.categoryName;
             newChild.id = child.categoryId;
-            newChild.icon = "fas fa-folder-open pt-0";
+            newChild.icon = "fas fa-folder-open text-dark pt-0";
             if (parent.children == null) {
                 parent.children = new List<Node>();
             }
             parent.children.Add(newChild);
             return newChild;
         }
-
+        
+        [WebMethod]
+        public static string AddCategory(int parentId, string catName) {
+            var res = AppUtils.AddCategory(parentId, catName, 1);
+            if (res == false) {
+                return "An error occured";
+            } else {
+                return "Category added";
+            }
+        }
         #endregion
 
         #region Note management WebMethods
@@ -86,7 +94,7 @@ namespace Nudge.Forms {
                                         "<h3 class='card-title text-bold'>" + note.noteTitle + "</h3>" +
                                         "<div class=''card-tools'>" +
                                             "<button type='button' class='btn btn-tool' data-card-widget='collapse' data-toggle='tooltip' title = 'Collapse' style='float:right'> " +
-                                                "<i class='fas fa-minus'>" + "</i>" +
+                                                "<i class='fas fa-minus text-dark'>" + "</i>" +
                                             "</button>" +
                                         "</div>" +
                                     "</div>" +
@@ -100,16 +108,16 @@ namespace Nudge.Forms {
                     printedNotes.Append("</div>" +
                                     "<div class='card-footer' style='border: none; background-color: " + note.noteHighlight + ";'>" +
                                         "<button type='button' class='btn btn-tool p-1' style='float: right'>" +
-                                        "    <i class='fas fa-ellipsis-v'></i>" +
+                                        "    <i class='fas fa-ellipsis-v text-dark'></i>" +
                                         "</button>" +
                                         "<button type='button' onclick='initializeEditModal(" + note.noteId + ", \"" + note.noteTitle + "\", \"" + note.noteContent + "\", \"" + note.noteHighlight + "\", " + note.categoryId + ")' class='btn btn-tool p-1' style='float: right'>" +
-                                        "    <i class='fas fa-edit'></i>" +
+                                        "    <i class='fas fa-edit text-dark'></i>" +
                                         "</button>" +
                                         "<button type='button' onclick='deleteNote(" + note.noteId + ")' class='btn btn-tool p-1' style='float: right'>" +
-                                        "    <i class='fas fa-trash-alt'></i>" +
+                                        "    <i class='fas fa-trash-alt text-dark'></i>" +
                                         "</button>" +
                                         "<button type='button' class='btn btn-tool p-1' style='float: right'>" +
-                                        "    <i class='fas fa-bookmark'></i>" +
+                                        "    <i class='fas fa-bookmark text-dark'></i>" +
                                         "</button>" +
                                     "</div>" +
                                 "</div>" +
