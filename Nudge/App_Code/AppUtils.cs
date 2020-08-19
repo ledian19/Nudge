@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Web;
 
 namespace Nudge.Utilities {
     public class AppUtils {
@@ -42,7 +40,7 @@ namespace Nudge.Utilities {
                                 var currentCategory = new category();
                                 currentCategory.categoryId = Convert.ToInt32(dr["category_id"].ToString());
                                 currentCategory.categoryName = dr["category_name"].ToString();
-                                currentCategory.parentId= string.IsNullOrEmpty(dr["parent_category"].ToString()) ? -1 : Convert.ToInt32(dr["parent_category"].ToString());
+                                currentCategory.parentId = string.IsNullOrEmpty(dr["parent_category"].ToString()) ? -1 : Convert.ToInt32(dr["parent_category"].ToString());
                                 myCategories.Add(currentCategory);
                             }
                         }
@@ -280,7 +278,7 @@ namespace Nudge.Utilities {
 
         public class tag {
             public int tagId { get; set; }
-            public string  tagName { get; set; }
+            public string tagName { get; set; }
         }
 
         #endregion
